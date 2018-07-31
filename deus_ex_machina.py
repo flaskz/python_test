@@ -16,9 +16,9 @@ class DeusExMachina:
     def getPreviousState(self):
         return self.previous
 
-    def getCurrentState(self):        
+    def getCurrentState(self):
         return self.current
-    
+
     def setInput(self, input):
         if input == 'stop':
             return 'stopped'
@@ -30,14 +30,14 @@ class DeusExMachina:
             return 'processing'
         else:
             return 'False statment.'
-        
-    
-    
+
+
+
     def setCurrentState(self, user_input):
         new_input = self.setInput(user_input)
         #print(new_input)
         if self.getCurrentState() == new_input:
-            print('Input equals to current state.')    
+            print('Input equals to current state.')
             return False
         if (user_input == 'start') & (self.current=='stopped'):
             self.started = True
@@ -50,7 +50,7 @@ class DeusExMachina:
         else:
             print('Invalid input.')
             return False
-        
+
         #print('setting ' + self.current + ' to false.')
         #set previous to false
         if self.current == 'started':
@@ -61,21 +61,21 @@ class DeusExMachina:
             self.stopped = False
         elif self.current == 'processing':
             self.processing = False
-            
+
         self.previous = self.current
         self.current = new_input
-        
+
         '''
         if self.current == 'collecting':
             matrix = self.collectData()
         elif self.current == 'processing':
             self.processData(matrix)
         '''
-        
-        
+
+
         #print('Set state to ' + self.current + '.')
         return True
-            
+
 
     def collectData(self):
         #print('Collecting...')
@@ -85,24 +85,26 @@ class DeusExMachina:
         matrix = np.random.uniform(low=1, high=9, size=(3,3))
 
         #self.setCurrentState('process')
-        
+
         print(matrix)
-        
+
         user_input = input('Do you want to continue do processing stage? yes/no: ')
+        while ((user_input != 'yes') & (user_input != 'no')):
+            user_input = input('Do you want to continue do collecting stage? yes/no: ')
         if user_input == 'yes':
             self.setCurrentState('process')
             self.processData(matrix)
-            
+
         return matrix
-            
+
     def info(self):
         print('started = ', self.started)
-        print('stoped = ', self.stopped)
+        print('stopped = ', self.stopped)
         print('collecting = ', self.collecting)
         print('processing = ', self.processing)
         print('current = ', self.current)
         print('previous = ', self.previous)
-    
+
     def processData(self, matrix):
         #print('Processing...')
         if self.processing == False:
@@ -110,20 +112,22 @@ class DeusExMachina:
             return False
         matrix = (matrix*5).transpose()
         print(matrix)
-        
+
         user_input = input('Do you want to continue do collecting stage? yes/no: ')
+        while ((user_input != 'yes') & (user_input != 'no')):
+            user_input = input('Do you want to continue do collecting stage? yes/no: ')
         if user_input == 'yes':
             self.setCurrentState('collect')
             self.collectData()
         self.setCurrentState('stop')
         return True
-        
+
 new_DeusEx = DeusExMachina()
 user_input = input('Choose next stage: ')
 while user_input != 'fim':
     if user_input == 'info':
         new_DeusEx.info()
-        
+
     else:
         vrf = new_DeusEx.setCurrentState(user_input)
         if (user_input == 'collect') & vrf:
@@ -132,4 +136,3 @@ while user_input != 'fim':
             matrix = input('Input matrix: ')
             new_DeusEx.processData(matrix)
     user_input = input('Choose next stage: ')
-    
