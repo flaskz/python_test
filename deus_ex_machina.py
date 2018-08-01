@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
+
 import numpy as np
 
 class DeusExMachina:
-    """
-    42
-    """
+    
+    input_dict = {
+            'stop' : 'stopped',
+            'start' : 'started',
+            'collect' : 'collecting',
+            'process' : 'processing'
+            }
+    
     def __init__(self):
-        self.started = False
-        self.collecting = False
-        self.stopped = True
-        self.processing = False
         self.previous = 'none'
         self.current = 'stopped'
 
@@ -19,118 +21,78 @@ class DeusExMachina:
     def getCurrentState(self):        
         return self.current
     
-    def setInput(self, input):
-        if input == 'stop':
-            return 'stopped'
-        elif input == 'start':
-            return 'started'
-        elif input == 'collect':
-            return 'collecting'
-        elif input == 'process':
-            return 'processing'
-        else:
-            return 'False statment.'
+    def setCurrentState(self, user_input, user):
+        new_input = self.input_dict.get(user_input, 'none')
         
-    
-    
-    def setCurrentState(self, user_input):
-        new_input = self.setInput(user_input)
-        #print(new_input)
-        if self.getCurrentState() == new_input:
-            print('Input equals to current state.')    
-            return False
-        if (user_input == 'start') & (self.current=='stopped'):
-            self.started = True
-        elif (user_input == 'collect') & ((self.current=='started') or (self.current=='processing')):
-            self.collecting = True
-        elif user_input == 'stop':
-            self.stopped = True
-        elif (user_input == 'process') & (self.current=='collecting'):
-            self.processing = True
+        if new_input != 'none':
+            if self.getCurrentState() == user_input:
+                print('Same state.')
+                return False
+            elif (self.getCurrentState() == 'stopped') & (user_input == 'start'):
+                self.previous = self.current
+                self.current = new_input
+                return True
+            elif (self.getCurrentState() == 'started') & ((user_input == 'collect')or(user_input == 'stop')):
+                self.previous = self.current
+                self.current = new_input
+                return True
+            elif (self.getCurrentState() == 'collecting') & ((user_input == 'process')or(user_input == 'stop')):
+                self.previous = self.current
+                self.current = new_input
+                return True
+            elif (self.getCurrentState() == 'processing') & ((user_input == 'stop')or
+                  ((user_input == 'collect')&(not user))):
+                self.previous = self.current
+                self.current = new_input
+                return True
+            else:
+                print('Invalid input.')
+                return False          
         else:
             print('Invalid input.')
-            return False
-        
-        #print('setting ' + self.current + ' to false.')
-        #set previous to false
-        if self.current == 'started':
-            self.started = False
-        elif self.current == 'collecting':
-            self.collecting = False
-        elif self.current == 'stopped':
-            self.stopped = False
-        elif self.current == 'processing':
-            self.processing = False
-            
-        self.previous = self.current
-        self.current = new_input
-        
-        '''
-        if self.current == 'collecting':
-            matrix = self.collectData()
-        elif self.current == 'processing':
-            self.processData(matrix)
-        '''
-        
-        
-        #print('Set state to ' + self.current + '.')
-        return True
-            
+            return False            
 
     def collectData(self):
         #print('Collecting...')
-        if self.collecting == False:
+        if self.current != 'collecting':
             print('Can not collect outside collecting state.')
-            return
+            return False
+        
         matrix = np.random.uniform(low=1, high=9, size=(3,3))
-
-        #self.setCurrentState('process')
         
         print(matrix)
         
-        user_input = input('Do you want to continue do processing stage? yes/no: ')
+        user_input = input('Do you want to continue to processing stage? yes/no: ')
         while (user_input != 'yes') & (user_input != 'no'):
-            user_input = input('Do you want to continue do processing stage? yes/no: ')        
+            user_input = input('Do you want to continue to processing stage? yes/no: ')        
         if user_input == 'yes':
-            self.setCurrentState('process')
+            self.setCurrentState('process', False)
             self.processData(matrix)
-        '''
-        else:
-            self.setCurrentState('stop')
-        '''
             
         return matrix
             
     def info(self):
-        print('started = ', self.started)
-        print('stoped = ', self.stopped)
-        print('collecting = ', self.collecting)
-        print('processing = ', self.processing)
         print('current = ', self.current)
         print('previous = ', self.previous)
     
     def processData(self, matrix):
         #print('Processing...')
-        if self.processing == False:
+        if self.current != 'processing':
             print('Can not process outside processing state.')
             return False
         matrix = (matrix*5).transpose()
         print(matrix)
         
-        user_input = input('Do you want to continue do collecting stage? yes/no: ')
+        user_input = input('Do you want to continue to collecting stage? yes/no: ')
         while (user_input != 'yes') & (user_input != 'no'):
-            user_input = input('Do you want to continue do collecting stage? yes/no: ')  
+            user_input = input('Do you want to continue to collecting stage? yes/no: ')  
         if user_input == 'yes':
-            self.setCurrentState('collect')
+            self.setCurrentState('collect', False)
             self.collectData()
-        '''
-        else:
-            self.setCurrentState('stop')
-        '''
         return True
         
 new_DeusEx = DeusExMachina()
-user_input = input('Set current state: ')
+user_input = input('Enter a valid command(help): ')
 while user_input != 'exit':
     if user_input == 'info':
         new_DeusEx.info()
@@ -139,11 +101,11 @@ while user_input != 'exit':
     elif (user_input == 'previous'):
         print(new_DeusEx.getPreviousState())
     else:
-        vrf = new_DeusEx.setCurrentState(user_input)
+        vrf = new_DeusEx.setCurrentState(user_input, True)
         if (user_input == 'collect') & vrf:
             new_DeusEx.collectData()
         elif (user_input == 'process') & vrf:
             matrix = input('Input matrix: ')
             new_DeusEx.processData(matrix)
-    user_input = input('Set current state: ')
+    user_input = input('Enter a valid command(help): ')
     
