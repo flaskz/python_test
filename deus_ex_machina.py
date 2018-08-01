@@ -74,6 +74,7 @@ class DeusExMachina:
     def info(self):
         print('current = ', self.current)
         print('previous = ', self.previous)
+        print('current -> gives current state.\nprevious -> gives previous state.\n(action) -> set machine to new state')
     
     def processData(self, matrix):
         #print('Processing...')
@@ -94,7 +95,7 @@ class DeusExMachina:
 new_DeusEx = DeusExMachina()
 user_input = input('Enter a valid command(help): ')
 while user_input != 'exit':
-    if user_input == 'info':
+    if user_input == 'help':
         new_DeusEx.info()
     elif (user_input == 'current'):
         print(new_DeusEx.getCurrentState())
@@ -103,9 +104,8 @@ while user_input != 'exit':
     else:
         vrf = new_DeusEx.setCurrentState(user_input, True)
         if (user_input == 'collect') & vrf:
-            new_DeusEx.collectData()
+            matrix = new_DeusEx.collectData()
         elif (user_input == 'process') & vrf:
-            matrix = input('Input matrix: ')
             new_DeusEx.processData(matrix)
     user_input = input('Enter a valid command(help): ')
     
